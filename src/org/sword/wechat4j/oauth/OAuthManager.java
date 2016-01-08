@@ -79,45 +79,48 @@ public class OAuthManager {
         return JSONObject.parseObject(response, GetAccessTokenResponse.class);
     }
 
-    /**
+     /**
      * 刷新access_token（如果需要）
-     * <p>参考<a href="http://mp.weixin.qq.com/wiki/17/c0f37d5704f0b64713d5d2c37b468d75.html#.E7.AC.AC.E4.B8.89.E6.AD.A5.EF.BC.9A.E5.88.B7.E6.96.B0access_token.EF.BC.88.E5.A6.82.E6.9E.9C.E9.9C.80.E8.A6.81.EF.BC.89">开发文档</a></p>
-     *
+     * 注意此处必须得为get请求
      * @param request
      * @return
      */
-    public static RefreshAccessTokenResponse refreshAccessToken(RefreshAccessTokenRequest request) throws OAuthException {
-        String response = post(HTTPS_API_WEIXIN_QQ_COM_SNS_OAUTH2_REFRESH_TOKEN, request);
+    public static RefreshAccessTokenResponse refreshAccessToken(RefreshAccessTokenRequest refreshAccessTokenRequest) throws OAuthException {
+        String userinfo_url = HTTPS_API_WEIXIN_QQ_COM_SNS_OAUTH2_REFRESH_TOKEN+"?appid="+refreshAccessTokenRequest.getAppid()
+        		+"&grant_type="+refreshAccessTokenRequest.getGrant_type()+"&refresh_token="+refreshAccessTokenRequest.getRefresh_token();
+ 		String response=HttpUtils.get(userinfo_url);
         check(response);
         return JSONObject.parseObject(response, RefreshAccessTokenResponse.class);
     }
 
+    
     /**
      * 拉取用户信息(需scope为 snsapi_userinfo)
-     * <p>参考<a href="http://mp.weixin.qq.com/wiki/17/c0f37d5704f0b64713d5d2c37b468d75.html#.E7.AC.AC.E5.9B.9B.E6.AD.A5.EF.BC.9A.E6.8B.89.E5.8F.96.E7.94.A8.E6.88.B7.E4.BF.A1.E6.81.AF.28.E9.9C.80scope.E4.B8.BA_snsapi_userinfo.29">开发文档</a></p>
-     *
+     * 注意此处必须得为get请求
      * @param request
      * @return
      */
-    public static GetUserinfoResponse getUserinfo(GetUserinfoRequest request) throws OAuthException {
-        String response = post(HTTPS_API_WEIXIN_QQ_COM_SNS_USERINFO, request);
-        check(response);
-        return JSONObject.parseObject(response, GetUserinfoResponse.class);
-    }
-
+    public static GetUserinfoResponse getUserinfo(GetUserinfoRequest getUserinfoRequest) throws OAuthException {
+	    String userinfo_url = HTTPS_API_WEIXIN_QQ_COM_SNS_USERINFO+"?access_token="+getUserinfoRequest.getAccess_token()+"&openid="+getUserinfoRequest.getOpenid()+"&lang=zh_CN";
+		String response=HttpUtils.get(userinfo_url);
+		check(response);
+		return JSONObject.parseObject(response, GetUserinfoResponse.class);
+	}
 
     /**
      * 检验授权凭证（access_token）是否有效
-     * <p>参考<a href="http://mp.weixin.qq.com/wiki/17/c0f37d5704f0b64713d5d2c37b468d75.html#.E9.99.84.EF.BC.9A.E6.A3.80.E9.AA.8C.E6.8E.88.E6.9D.83.E5.87.AD.E8.AF.81.EF.BC.88access_token.EF.BC.89.E6.98.AF.E5.90.A6.E6.9C.89.E6.95.88">开发文档</a></p>
-     *
-     * @param request
+     * 注意此处必须得为get请求
+     * @param validAccessTokenRequest
      * @return
+     * @throws OAuthException
      */
-    public static ValidAccessTokenResponse validAccessToken(ValidAccessTokenRequest request) throws OAuthException {
-        String response = post(HTTPS_API_WEIXIN_QQ_COM_SNS_AUTH, request);
+    public static ValidAccessTokenResponse validAccessToken(ValidAccessTokenRequest validAccessTokenRequest) throws OAuthException {
+        String userinfo_url = HTTPS_API_WEIXIN_QQ_COM_SNS_AUTH+"?access_token="+validAccessTokenRequest.getAccess_token()+"&openid="+validAccessTokenRequest.getOpenid();
+		String response=HttpUtils.get(userinfo_url);
         check(response);
         return JSONObject.parseObject(response, ValidAccessTokenResponse.class);
     }
+    
 
     /**
      * 使用UTF-8进行URL编码
